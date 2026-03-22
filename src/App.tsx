@@ -7,14 +7,7 @@ import "bootstrap/dist/css/bootstrap.min.css";
 
 const App = () => {
 
-  //изменения от другого разработчика
-  //мы тут сделали огромное домашнее задание
-  //что-то где-то изменить в больших количествах
-
-  const [isLogin, setIsLogin] = useState<boolean>(false)
-
-  //добавили кучу для pdf 
-  //все есть, все работает
+  
   const [editUser, setEditUser] = useState<UserModel | null>(null)
 
   return (
