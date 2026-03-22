@@ -6,6 +6,8 @@ import { UserList } from "./user-list";
 import "bootstrap/dist/css/bootstrap.min.css";
 
 const App = () => {
+
+  //изменения от другого разработчика
   //мы тут сделали огромное домашнее задание
   //что-то где-то изменить в больших количествах
 
