@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useCreateUser } from "./api-methods/create-user";
 import { useGetUsers } from "./api-methods/get-user";
 import type { CreateUserInput, UserModel } from "./types";
@@ -48,6 +48,7 @@ export const CreateUserForm = ({ editUser, onClick }: CreateFormProps) => {
       age: age,
       phone: "+7" + phone,
       isCitizen: isCitizen,
+      resume: resume,
     } as CreateUserInput;
 
     createUser(input, { onSuccess: onCreateSuccess });
@@ -68,6 +69,14 @@ export const CreateUserForm = ({ editUser, onClick }: CreateFormProps) => {
     setAgeValid(true);
     setPhoneValid(false);
     setIsPhoneTouched(false);
+
+    setIsResumeValid(false);
+    setIsResumeTouched(false);
+    setResume(null);
+
+    if (inputRef && inputRef.current) {
+      inputRef.current.value = "";
+    }
 
     onClick();
   };
@@ -94,8 +103,12 @@ export const CreateUserForm = ({ editUser, onClick }: CreateFormProps) => {
   const [isPhoneValid, setPhoneValid] = useState<boolean>(false);
   const [isPhoneTouched, setIsPhoneTouched] = useState<boolean>(false);
 
-  useEffect(() => {
+  const inputRef = useRef<HTMLInputElement>(null);
+  const [resume, setResume] = useState<string | null>(null);
+  const [isResumwValid, setIsResumeValid] = useState<boolean>(false);
+  const [isResumeTouched, setIsResumeTouched] = useState<boolean>(false);
 
+  useEffect(() => {
     if (!editUser) {
       setFirstName("");
       setLastName("");
@@ -110,6 +123,14 @@ export const CreateUserForm = ({ editUser, onClick }: CreateFormProps) => {
       setPhoneValid(false);
       setIsPhoneTouched(false);
 
+      setIsResumeValid(false);
+      setIsResumeTouched(false);
+      setResume(null);
+
+      if (inputRef && inputRef.current) {
+        inputRef.current.value = "";
+      }
+
       return;
     }
 
@@ -118,6 +139,7 @@ export const CreateUserForm = ({ editUser, onClick }: CreateFormProps) => {
     setAge(editUser?.age ?? 18);
     setIsCitizen(editUser?.isCitizen ?? false);
     setPhone(editUser?.phone.substring(2) ?? "");
+    setResume(editUser?.resume);
 
     const isValid = {
       isLengthValid: true,
@@ -135,6 +157,9 @@ export const CreateUserForm = ({ editUser, onClick }: CreateFormProps) => {
     setAgeValid(true);
     setPhoneValid(true);
     setIsPhoneTouched(true);
+
+    setIsResumeValid(true);
+    setIsResumeTouched(true);
   }, [editUser]);
 
   const handleOnNameChange = (text: string) => {
@@ -205,6 +230,29 @@ export const CreateUserForm = ({ editUser, onClick }: CreateFormProps) => {
   //isFirstNameValid.isValid ? "is-valid" : "is-invalid"
 
   const hasLastName = lastName !== undefined && lastName.length > 0;
+
+  const handleDownloadFile = (f: File | null) => {
+    setIsResumeTouched(true);
+
+    if (f?.type !== "application/pdf") {
+      setIsResumeValid(false);
+      return;
+    }
+
+    if (!f.name.toLowerCase().endsWith(".pdf")) {
+      setIsResumeValid(false);
+      return;
+    }
+
+    setResume(f.name);
+    setIsResumeValid(true);
+  };
+
+  const handleDeleteResume = () => {
+    setResume(null);
+    setIsResumeValid(false);
+    setIsResumeTouched(false);
+  }
 
   return (
     <div
@@ -320,21 +368,54 @@ export const CreateUserForm = ({ editUser, onClick }: CreateFormProps) => {
         />
       </div>
 
+      {resume && resume !== "" && (
+        <div
+          style={{ backgroundColor: "rgb(231, 231, 231" }}
+          className="w-100 p-2 rounded-2 d-flex flex-row aliign-items-center justify-content-between"
+        >
+          <span>{resume}</span>
+          <button onClick={handleDeleteResume} className="btn btn-close"></button>
+        </div>
+      )}
+
+      {!resume && (
+        <>          
+          <span className="my-3">Прикрепите резюме файл в формате pdf</span>
+          <input
+            ref={inputRef}
+            accept=".pdf"
+            type="file"
+            className={`form-control ${isResumeTouched ? (isResumwValid ? "is-valid" : "is-invalid") : ""}`}
+            onChange={(e) => {
+              if (e.target.files && e.target.files.length > 0) {
+                handleDownloadFile(e.target.files[0]);
+              }
+            }}
+          />
+        </>
+      )}
+
+      {isResumeTouched && !isResumwValid && (
+        <span className="text-danger"> Файл не в формате pdf</span>
+      )}
+
       <button
         disabled={
           isUserCreating ||
           !isFirstNameValid.isValid ||
           !isLastNameValid.isValid ||
           !isAgeValid ||
-          !isPhoneValid
+          !isPhoneValid ||
+          !isResumwValid ||
+          resume === null
         }
         onClick={hadnleCreate}
-        className={`btn btn-${editUser? "primary" : "success"}`}
+        className={`btn btn-${editUser ? "primary" : "success"}`}
       >
-        {isUserCreating ? `${editUser ? "Cохранение" : "Добавление" }` :
-        `${editUser ? "Сохранить" : "Добавить"}`}
+        {isUserCreating
+          ? `${editUser ? "Cохранение" : "Добавление"}`
+          : `${editUser ? "Сохранить" : "Добавить"}`}
       </button>
-   
 
       {editUser && (
         <button

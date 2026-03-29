@@ -6,6 +6,7 @@ export interface UserModel {
   phone: string;
   isCitizen: boolean;
   createDate: string;
+  resume : string;
 }
 
 export interface CreateUserInput {
@@ -15,4 +16,5 @@ export interface CreateUserInput {
   age: number;
   phone: string;
   isCitizen: boolean;
+  resume : string;
 }
