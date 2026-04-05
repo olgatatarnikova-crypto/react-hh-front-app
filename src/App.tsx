@@ -1,9 +1,9 @@
 import { useState } from "react";
-import "./App.css";
-import { CreateUserForm } from "./create-user-form";
-import type { UserModel } from "./types";
-import { UserList } from "./user-list";
+import "./App.css"; 
+import type { UserModel } from "./lib/types"; 
 import "bootstrap/dist/css/bootstrap.min.css";
+import { CreateUserForm } from "./components/create-user-form";
+import { UserList } from "./components/user-list";
 
 const App = () => {
 

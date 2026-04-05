@@ -18,3 +18,12 @@ export interface CreateUserInput {
   isCitizen: boolean;
   resume : string;
 }
+
+//интерфейс для резюме
+export interface VacancyModel {
+  id: number;
+  title: string;
+  city: string;
+  salary: number;
+  isOnlyRussian: boolean;
+}

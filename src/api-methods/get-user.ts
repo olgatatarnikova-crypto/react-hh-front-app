@@ -1,6 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
-import { api } from "../api";
-import type { UserModel } from "../types";
+import { api } from "./api";
+import type { UserModel } from "../lib/types";
 
 const UsersQueryKey = ["UsersQueryKey"];
 

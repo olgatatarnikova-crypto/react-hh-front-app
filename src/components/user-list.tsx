@@ -1,8 +1,7 @@
-import { useDeleteUser } from "./api-methods/delete-user";
-import { useGetUsers } from "./api-methods/get-user";
-import type { UserModel } from "./types";
+import { useDeleteUser } from "../api-methods/delete-user";
+import { useGetUsers } from "../api-methods/get-user";
+import type { UserModel } from "../lib/types";
 import { UserRow } from "./userrow";
-
 
 interface UserListProps{
   editUser: UserModel | null;
