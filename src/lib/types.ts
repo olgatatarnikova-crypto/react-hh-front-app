@@ -19,11 +19,26 @@ export interface CreateUserInput {
   resume : string;
 }
 
-//интерфейс для резюме
-export interface VacancyModel {
-  id: number;
-  title: string;
-  city: string;
-  salary: number;
-  isOnlyRussian: boolean;
+export interface TextValidation {
+  isLengthValid: boolean;
+  isSpecialSymbolValid: boolean;
+  isTextEmptyValid: boolean;
+  isFiesrUpperCaswValid: boolean;
+  isValid: boolean;
+  isTouched: boolean;
+}
+
+interface BaseField {
+  isValid: boolean;
+  isTouched: boolean;
+  errorText: string | null;
+
+}
+
+export interface TextField extends BaseField {
+  text: string;     
+}
+
+export interface NumberField extends BaseField {
+   number: number | null;   
 }

@@ -1,17 +1,9 @@
 import { useEffect, useRef, useState } from "react";
 import { useGetUsers } from "../api-methods/get-user";
 import { useCreateUser } from "../api-methods/create-user";
-import type { CreateUserInput, UserModel } from "../lib/types";
+import type { CreateUserInput, TextValidation, UserModel } from "../lib/types";
+import { Container } from "../shared/container";
 
-
-interface TextValidation {
-  isLengthValid: boolean;
-  isSpecialSymbolValid: boolean;
-  isTextEmptyValid: boolean;
-  isFiesrUpperCaswValid: boolean;
-  isValid: boolean;
-  isTouched: boolean;
-}
 
 interface CreateFormProps {
   editUser: UserModel | null;
@@ -256,10 +248,7 @@ export const CreateUserForm = ({ editUser, onClick }: CreateFormProps) => {
   }
 
   return (
-    <div
-      style={{ width: "400px" }}
-      className="d-flex flex-column gap-2 p-3 bg-light shadow rounded-3"
-    >
+    <Container>    
       <input
         value={firstName}
         onChange={(e) => handleOnNameChange(e.target.value)}
@@ -427,6 +416,6 @@ export const CreateUserForm = ({ editUser, onClick }: CreateFormProps) => {
           Отмена
         </button>
       )}
-    </div>
+    </Container>
   );
 };

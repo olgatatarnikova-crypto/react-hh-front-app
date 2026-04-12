@@ -4,6 +4,7 @@ import type { UserModel } from "./lib/types";
 import "bootstrap/dist/css/bootstrap.min.css";
 import { CreateUserForm } from "./components/create-user-form";
 import { UserList } from "./components/user-list";
+import { CreateApplicationForm } from "./components/create-application-form";
 
 const App = () => {
 
@@ -12,9 +13,10 @@ const App = () => {
 
   return (
     <div className="d-flex flex-column gap-2 align-items-center p-3">
-      <CreateUserForm editUser={editUser} onClick={ () => setEditUser(null)} />
+     {/* <CreateUserForm editUser={editUser} onClick={ () => setEditUser(null)} />
       <UserList onEditClick={setEditUser}  editUser={editUser} resetUser={() => setEditUser(null)}/>
-      
+       */}
+      <CreateApplicationForm/>
     </div>
   );
 };
