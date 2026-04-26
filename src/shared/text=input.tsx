@@ -9,9 +9,16 @@ interface TextInputProps {
   onChange: (t: string) => void;
 }
 
-export const TextInput = ({ field, placeholder, isDisabled, width, onChange }: TextInputProps) => {
+export const TextInput = ({
+  field,
+  placeholder,
+  isDisabled,
+  width,
+  onChange,
+}: TextInputProps) => {
   return (
-    <div style={{width: width ?? INPUT_WIDTH}}>
+    <div className="d-flex flex-column gap-1 allign-items-start"
+    style={{ width: width ?? INPUT_WIDTH }}>
       <input
         value={field.text}
         onChange={(e) => onChange(e.target.value)}
@@ -20,9 +27,15 @@ export const TextInput = ({ field, placeholder, isDisabled, width, onChange }: T
         placeholder={placeholder}
         disabled={isDisabled}
       />
-      {field.errorText && (
-        <span className="text-danger">{field.errorText}</span>
-      )}
+      <div className="d-flex flex-column">
+        {field.errors &&
+          field.errors.length > 0 &&
+          field.errors.map((e, i) => (
+            <span className="text-danger" key={i}>
+              {e}
+            </span>
+          ))}
+      </div>
     </div>
   );
 };

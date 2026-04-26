@@ -6,7 +6,7 @@ interface ContainerProps {
 
 export const Container = ({ children }: ContainerProps) => {
   return (
-    <div className="d-flex flex-column gap-2 p-3 bg-light shadow rounded-3">
+    <div className="p-3 bg-light shadow rounded-3">
       {children}
     </div>
   );

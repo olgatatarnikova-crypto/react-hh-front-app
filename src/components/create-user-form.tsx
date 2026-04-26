@@ -1,34 +1,71 @@
 import { useEffect, useRef, useState } from "react";
 import { useGetUsers } from "../api-methods/get-user";
 import { useCreateUser } from "../api-methods/create-user";
-import type { CreateUserInput, TextValidation, UserModel } from "../lib/types";
+import type {
+  CheckBoxField,
+  CreateUserInput,
+  NumberField,
+  TextField,
+  UserModel,
+} from "../lib/types";
 import { Container } from "../shared/container";
-
+import { TextInput } from "../shared/text=input";
+import { NumberInput } from "../shared/number=input";
+import { CheckBoxInput } from "../shared/checkBox-input";
+import { Row } from "../shared/row";
+import { Column } from "../shared/column";
+import { PhoneInput } from "../shared/phone-input";
 
 interface CreateFormProps {
   editUser: UserModel | null;
   onClick: () => void;
 }
 
-const isFirstNameValidationDefailt = {
-  isLengthValid: false,
-  isSpecialSymbolValid: false,
-  isTextEmptyValid: false,
-  isFiesrUpperCaswValid: false,
-  isValid: false,
+const DEFAULT_FIRST_NAME = {
+  text: "",
   isTouched: false,
-} as TextValidation;
+  isValid: false,
+} as TextField;
 
-const isLastNameValidationDefailt = {
-  isLengthValid: false,
-  isSpecialSymbolValid: false,
-  isTextEmptyValid: false,
-  isFiesrUpperCaswValid: false,
-  isValid: false,
+const DEFAULT_LAST_NAME = {
+  text: "",
   isTouched: false,
-} as TextValidation;
+  isValid: false,
+} as TextField;
+
+const DEFAULT_AGE = {
+  number: null,
+  isTouched: false,
+  isValid: false,
+} as NumberField;
+
+const DEFAULT_CITIZEN = {
+  status: false,
+  isTouched: false,
+  isValid: false,
+} as CheckBoxField;
+
+const DEFAULT_PHONE = {
+  text: "",
+  isTouched: false,
+  isValid: false,
+} as TextField;
+
+
 
 export const CreateUserForm = ({ editUser, onClick }: CreateFormProps) => {
+  const [firstName, setFirstName] = useState<TextField>(DEFAULT_FIRST_NAME);
+  const [lastName, setLastName] = useState<TextField>(DEFAULT_LAST_NAME);
+  const [age, setAge] = useState<NumberField>(DEFAULT_AGE);
+  const [isCitizen, setIsCitizen] = useState<CheckBoxField>(DEFAULT_CITIZEN);
+
+  const [phone, setPhone] = useState<TextField>(DEFAULT_PHONE);
+  
+
+  const inputRef = useRef<HTMLInputElement>(null);
+  const [resume, setResume] = useState<string | null>(null);
+  const [isResumwValid, setIsResumeValid] = useState<boolean>(false);
+  const [isResumeTouched, setIsResumeTouched] = useState<boolean>(false);
   const { refetch: refetchUsers } = useGetUsers();
 
   const { mutate: createUser, isPending: isUserCreating } = useCreateUser();
@@ -36,11 +73,11 @@ export const CreateUserForm = ({ editUser, onClick }: CreateFormProps) => {
   const hadnleCreate = () => {
     const input = {
       id: editUser?.id ?? -1,
-      firstName: firstName,
-      lastName: lastName,
-      age: age,
-      phone: "+7" + phone,
-      isCitizen: isCitizen,
+      firstName: firstName.text,
+      lastName: lastName.text,
+      age: age.number,
+      phone: "+7" + phone.text,
+      isCitizen: isCitizen.status,
       resume: resume,
     } as CreateUserInput;
 
@@ -48,20 +85,18 @@ export const CreateUserForm = ({ editUser, onClick }: CreateFormProps) => {
   };
 
   const onCreateSuccess = () => {
+    resetForm();
     refetchUsers();
+    onClick();
+  };
 
-    setFirstName("");
-    setLastName("");
-    setPhone("");
-    setAge(18);
-    setIsCitizen(false);
+  const resetForm = () => {
+    setFirstName(DEFAULT_FIRST_NAME);
+    setLastName(DEFAULT_LAST_NAME);
 
-    setFirstNameValid(isFirstNameValidationDefailt);
-    setLastNameValid(isLastNameValidationDefailt);
-    setAgeTouched(false);
-    setAgeValid(true);
-    setPhoneValid(false);
-    setIsPhoneTouched(false);
+    setPhone(DEFAULT_PHONE);
+    setAge(DEFAULT_AGE);
+    setIsCitizen(DEFAULT_CITIZEN);
 
     setIsResumeValid(false);
     setIsResumeTouched(false);
@@ -70,92 +105,54 @@ export const CreateUserForm = ({ editUser, onClick }: CreateFormProps) => {
     if (inputRef && inputRef.current) {
       inputRef.current.value = "";
     }
-
-    onClick();
   };
-
-  const [firstName, setFirstName] = useState<string>(editUser?.firstName ?? "");
-  const [isFirstNameValid, setFirstNameValid] = useState<TextValidation>(
-    isFirstNameValidationDefailt,
-  );
-
-  const [lastName, setLastName] = useState<string>(editUser?.lastName ?? "");
-  const [isLastNameValid, setLastNameValid] = useState<TextValidation>(
-    isLastNameValidationDefailt,
-  );
-
-  const [age, setAge] = useState<number>(editUser?.age ?? 18);
-  const [isAgeValid, setAgeValid] = useState<boolean>(false);
-  const [isAgeTouched, setAgeTouched] = useState<boolean>(false);
-
-  const [isCitizen, setIsCitizen] = useState<boolean>(
-    editUser?.isCitizen ?? false,
-  );
-
-  const [phone, setPhone] = useState<string>(editUser?.phone ?? "");
-  const [isPhoneValid, setPhoneValid] = useState<boolean>(false);
-  const [isPhoneTouched, setIsPhoneTouched] = useState<boolean>(false);
-
-  const inputRef = useRef<HTMLInputElement>(null);
-  const [resume, setResume] = useState<string | null>(null);
-  const [isResumwValid, setIsResumeValid] = useState<boolean>(false);
-  const [isResumeTouched, setIsResumeTouched] = useState<boolean>(false);
 
   useEffect(() => {
     if (!editUser) {
-      setFirstName("");
-      setLastName("");
-      setPhone("");
-      setAge(18);
-      setIsCitizen(false);
-
-      setFirstNameValid(isFirstNameValidationDefailt);
-      setLastNameValid(isLastNameValidationDefailt);
-      setAgeTouched(false);
-      setAgeValid(true);
-      setPhoneValid(false);
-      setIsPhoneTouched(false);
-
-      setIsResumeValid(false);
-      setIsResumeTouched(false);
-      setResume(null);
-
-      if (inputRef && inputRef.current) {
-        inputRef.current.value = "";
-      }
-
+      resetForm();
       return;
     }
 
-    setFirstName(editUser?.firstName ?? "");
-    setLastName(editUser?.lastName ?? "");
-    setAge(editUser?.age ?? 18);
-    setIsCitizen(editUser?.isCitizen ?? false);
-    setPhone(editUser?.phone.substring(2) ?? "");
-    setResume(editUser?.resume);
-
-    const isValid = {
-      isLengthValid: true,
-      isSpecialSymbolValid: true,
-      isTextEmptyValid: true,
-      isFiesrUpperCaswValid: true,
-      isValid: true,
+    setFirstName({
+      text: editUser?.firstName ?? "",
       isTouched: true,
-    } as TextValidation;
+      isValid: true,
+    } as TextField);
 
-    setFirstNameValid(isValid);
-    setLastNameValid(isValid);
+    setLastName({
+      text: editUser?.lastName ?? "",
+      isTouched: true,
+      isValid: true,
+    } as TextField);
 
-    setAgeTouched(true);
-    setAgeValid(true);
-    setPhoneValid(true);
-    setIsPhoneTouched(true);
+    setAge({
+      number: editUser?.age,
+      isTouched: true,
+      isValid: true,
+    } as NumberField);
+
+    setIsCitizen({
+      status: editUser?.isCitizen,
+      isTouched: true,
+      isValid: true,
+    } as CheckBoxField);
+
+    setPhone({
+      text: editUser?.phone ?? "",
+      isTouched: true, 
+      isValid: true
+      
+    }as TextField);
+    setResume(editUser?.resume);
+   
 
     setIsResumeValid(true);
     setIsResumeTouched(true);
-  }, [editUser]);
+  }, [editUser?.id]);
 
   const handleOnNameChange = (text: string) => {
+    const errorsMsgs = [] as string[];
+
     const p1 = text.length >= 2;
     const p2 = /^[a-zA-Zа-яА-ЯёЁ\s]+$/.test(text);
     const p3 = text !== "";
@@ -164,22 +161,33 @@ export const CreateUserForm = ({ editUser, onClick }: CreateFormProps) => {
       text.length > 0 &&
       text[0] === text[0].toUpperCase();
 
-    const isNameValid = {
-      isLengthValid: p1,
-      isSpecialSymbolValid: p2,
-      isTextEmptyValid: p3,
-      isFiesrUpperCaswValid: p4,
+    if (!p1) {
+      errorsMsgs.push("Имя не может быть меньше двух символов");
+    }
 
-      isValid: p1 && p2 && p3 && p4,
+    if (!p2) {
+      errorsMsgs.push("Имя не должно содержать спецсимволы");
+    }
+
+    if (!p3) {
+      errorsMsgs.push("Имя не может быть пустым");
+    }
+
+    if (!p4) {
+      errorsMsgs.push("Имя должно начинаться с заглавной буквы");
+    }
+
+    setFirstName({
+      text: text,
       isTouched: true,
-    } as TextValidation;
-
-    setFirstNameValid(isNameValid);
-
-    setFirstName(text);
+      isValid: p1 && p2 && p3 && p4,
+      errors: errorsMsgs,
+    } as TextField);
   };
 
   const handleOnLastNameChange = (text: string) => {
+    const errorsMsgs = [] as string[];
+
     const p1 = text.length >= 2;
     const p2 = /^[a-zA-Zа-яА-ЯёЁ\s]+$/.test(text);
     const p3 = text !== "";
@@ -188,41 +196,77 @@ export const CreateUserForm = ({ editUser, onClick }: CreateFormProps) => {
       text.length > 0 &&
       text[0] === text[0].toUpperCase();
 
-    const isLastNameValid = {
-      isLengthValid: p1,
-      isSpecialSymbolValid: p2,
-      isTextEmptyValid: p3,
-      isFiesrUpperCaswValid: p4,
+    if (!p1) {
+      errorsMsgs.push("Фамилия не может быть меньше двух символов");
+    }
 
-      isValid: p1 && p2 && p3 && p4,
+    if (!p2) {
+      errorsMsgs.push("Фамилия не должна содержать спецсимволы");
+    }
+
+    if (!p3) {
+      errorsMsgs.push("Фамилия не может быть пустым");
+    }
+
+    if (!p4) {
+      errorsMsgs.push("Фамилия должно начинаться с заглавной буквы");
+    }
+
+    setLastName({
+      text: text,
       isTouched: true,
-    } as TextValidation;
-
-    setLastNameValid(isLastNameValid);
-
-    setLastName(text);
+      isValid: p1 && p2 && p3 && p4,
+      errors: errorsMsgs,
+    } as TextField);
   };
 
-  const handleAgeChange = (age: number) => {
-    setAgeValid(age >= 18 && age <= 99);
-    setAgeTouched(true);
-    setAge(age);
+  const handleAgeChange = (age: number | null) => {
+    const p2 = age !== null;
+    const p1 = age !== null && age >= 18 && age <= 99;
+
+    const errorsMsgs = [] as string[];
+
+    if (!p2) {
+      errorsMsgs.push("Возраст указать обязательно");
+    }
+
+    if (!p1 && p2) {
+      errorsMsgs.push("Возраст должен быть в диапазоне 18 - 99 лет");
+    }
+
+    setAge({
+      number: age,
+      isValid: p1 && p2,
+      isTouched: true,
+      errors: errorsMsgs,
+    } as NumberField);
   };
 
   const handleOnPhoneChange = (phone: string) => {
     const cleanPhone = phone.replace(/\D/g, "");
 
-    setPhoneValid(/^\d{10}$/.test(phone));
+    const p1 = (/^\d{10}$/.test(cleanPhone));
+    const errorsMsgs = [] as string[];
 
-    setIsPhoneTouched(true);
+    if(!p1) {
+      errorsMsgs.push("Некорректный номер");
+    }
 
-    setPhone(cleanPhone);
+     setPhone({
+      text: cleanPhone,
+      isTouched: true,
+      isValid: p1,
+      errors: errorsMsgs,
+    } as TextField);
   };
 
-  const hasFirstName = firstName !== undefined && firstName.length > 0;
-  //isFirstNameValid.isValid ? "is-valid" : "is-invalid"
-
-  const hasLastName = lastName !== undefined && lastName.length > 0;
+  const handleOnCitizenChange = (status: boolean) => {
+    setIsCitizen({
+      status: status,
+      isTouched: true,
+      isValid: true,
+    } as CheckBoxField);
+  };
 
   const handleDownloadFile = (f: File | null) => {
     setIsResumeTouched(true);
@@ -245,177 +289,112 @@ export const CreateUserForm = ({ editUser, onClick }: CreateFormProps) => {
     setResume(null);
     setIsResumeValid(false);
     setIsResumeTouched(false);
-  }
+  };
 
   return (
-    <Container>    
-      <input
-        value={firstName}
-        onChange={(e) => handleOnNameChange(e.target.value)}
-        className={`form-control ${isFirstNameValid.isTouched ? (isFirstNameValid.isValid ? "is-valid" : "is-invalid") : ""}`}
-        type="text"
-        placeholder="Имя"
-        disabled={isUserCreating}
-      />
-
-      {isFirstNameValid.isTouched && !isFirstNameValid.isTextEmptyValid && (
-        <span className="text-danger">Имя не может быть пустым</span>
-      )}
-
-      {hasFirstName &&
-        isFirstNameValid.isTouched &&
-        !isFirstNameValid.isLengthValid && (
-          <span className="text-danger">
-            Имя не может быть меньше друх символов
-          </span>
-        )}
-
-      {hasFirstName &&
-        hasFirstName &&
-        isFirstNameValid.isTouched &&
-        !isFirstNameValid.isFiesrUpperCaswValid && (
-          <span className="text-danger">
-            Имя должно начинаться с заглавной буквы
-          </span>
-        )}
-
-      {hasFirstName &&
-        isFirstNameValid.isTouched &&
-        !isFirstNameValid.isSpecialSymbolValid && (
-          <span className="text-danger">
-            Имя не может содержать специальные символы и цифры
-          </span>
-        )}
-
-      <input
-        value={lastName}
-        onChange={(e) => handleOnLastNameChange(e.target.value)}
-        className={`form-control ${isLastNameValid.isTouched ? (isLastNameValid.isValid ? "is-valid" : "is-invalid") : ""}`}
-        type="text"
-        placeholder="Фамилия"
-        disabled={isUserCreating}
-      />
-
-      {isLastNameValid.isTouched && !isLastNameValid.isTextEmptyValid && (
-        <span className="text-danger">Поле фамилия не может быть пустым</span>
-      )}
-
-      {hasLastName &&
-        isLastNameValid.isTouched &&
-        !isLastNameValid.isLengthValid && (
-          <span className="text-danger">
-            Фамилия не может быть меньше двух символов
-          </span>
-        )}
-
-      {hasLastName &&
-        isLastNameValid.isTouched &&
-        !isLastNameValid.isFiesrUpperCaswValid && (
-          <span className="text-danger">
-            Фамилия должна начинаться с заглавной буквы
-          </span>
-        )}
-
-      {hasLastName &&
-        isLastNameValid.isTouched &&
-        !isLastNameValid.isSpecialSymbolValid && (
-          <span className="text-danger">
-            Фамилия не может содержать специальные символы
-          </span>
-        )}
-
-      <div className="d-flex flex-row align-items-center gap-3 justify-content-between">
-        <input
-          className={`form-control w-50" ${isAgeTouched ? (isAgeValid ? "is-valid" : "is-invalid") : ""}`}
-          type="number"
-          value={age}
-          onChange={(e) => handleAgeChange(Number(e.target.value))}
-          min={18}
-          max={99}
-          placeholder="Возраст"
-          disabled={isUserCreating}
+    <Container>
+      <Column>
+        <TextInput
+          field={firstName}
+          placeholder="Имя"
+          onChange={handleOnNameChange}
+          isDisabled={isUserCreating}
         />
-        <span className="text-nowrap">Гражданин РФ</span>
-        <input
-          className="form-check-input"
-          type="checkbox"
-          checked={isCitizen}
-          onChange={(e) => setIsCitizen(e.target.checked)}
-          disabled={isUserCreating}
+
+        <TextInput
+          field={lastName}
+          placeholder="Фамилия"
+          onChange={handleOnLastNameChange}
+          isDisabled={isUserCreating}
         />
-      </div>
 
-      <div className="input-group">
-        <span className="input-group-text">+7</span>
-
-        <input
-          value={phone}
-          onChange={(e) => handleOnPhoneChange(e.target.value)}
-          className={`form-control ${isPhoneTouched ? (isPhoneValid ? "is-valid" : "is-invalid") : ""}`}
-          type="text"
-          placeholder="900 000 00 00"
-          disabled={isUserCreating}
-        />
-      </div>
-
-      {resume && resume !== "" && (
-        <div
-          style={{ backgroundColor: "rgb(231, 231, 231" }}
-          className="w-100 p-2 rounded-2 d-flex flex-row aliign-items-center justify-content-between"
-        >
-          <span>{resume}</span>
-          <button onClick={handleDeleteResume} className="btn btn-close"></button>
-        </div>
-      )}
-
-      {!resume && (
-        <>          
-          <span className="my-3">Прикрепите резюме файл в формате pdf</span>
-          <input
-            ref={inputRef}
-            accept=".pdf"
-            type="file"
-            className={`form-control ${isResumeTouched ? (isResumwValid ? "is-valid" : "is-invalid") : ""}`}
-            onChange={(e) => {
-              if (e.target.files && e.target.files.length > 0) {
-                handleDownloadFile(e.target.files[0]);
-              }
-            }}
+        <Row>
+          <NumberInput
+            field={age}
+            placeholder="Возраст"
+            onChange={handleAgeChange}
+            isDisabled={isUserCreating}
+            width={100}
           />
-        </>
-      )}
 
-      {isResumeTouched && !isResumwValid && (
-        <span className="text-danger"> Файл не в формате pdf</span>
-      )}
+          <CheckBoxInput
+            field={isCitizen}
+            onChange={handleOnCitizenChange}
+            isDisabled={isUserCreating}
+            label="Гражданин РФ"
+            width={150}
+          />
+        </Row>
 
-      <button
-        disabled={
-          isUserCreating ||
-          !isFirstNameValid.isValid ||
-          !isLastNameValid.isValid ||
-          !isAgeValid ||
-          !isPhoneValid ||
-          !isResumwValid ||
-          resume === null
-        }
-        onClick={hadnleCreate}
-        className={`btn btn-${editUser ? "primary" : "success"}`}
-      >
-        {isUserCreating
-          ? `${editUser ? "Cохранение" : "Добавление"}`
-          : `${editUser ? "Сохранить" : "Добавить"}`}
-      </button>
+        <PhoneInput
+        field={phone}
+        placeholder="900 000 00 00"
+        onChange={handleOnPhoneChange}  
+        isDisabled={isUserCreating}   
+        />
+       
+        {resume && resume !== "" && (
+          <div
+            style={{ backgroundColor: "rgb(231, 231, 231" }}
+            className="w-100 p-2 rounded-2 d-flex flex-row aliign-items-center justify-content-between"
+          >
+            <span>{resume}</span>
+            <button
+              onClick={handleDeleteResume}
+              className="btn btn-close"
+            ></button>
+          </div>
+        )}
 
-      {editUser && (
+        {!resume && (
+          <>
+            <span className="my-3">Прикрепите резюме файл в формате pdf</span>
+            <input
+              ref={inputRef}
+              accept=".pdf"
+              type="file"
+              className={`form-control ${isResumeTouched ? (isResumwValid ? "is-valid" : "is-invalid") : ""}`}
+              onChange={(e) => {
+                if (e.target.files && e.target.files.length > 0) {
+                  handleDownloadFile(e.target.files[0]);
+                }
+              }}
+            />
+          </>
+        )}
+
+        {isResumeTouched && !isResumwValid && (
+          <span className="text-danger"> Файл не в формате pdf</span>
+        )}
+
         <button
-          onClick={onClick}
-          disabled={isUserCreating}
-          className="btn btn-danger"
+          disabled={
+            isUserCreating ||
+            !firstName.isValid ||
+            !lastName.isValid ||
+            !age.isValid ||
+            !phone.isValid ||
+            !isResumwValid ||
+            resume === null
+          }
+          onClick={hadnleCreate}
+          className={`btn btn-${editUser ? "primary" : "success"}`}
         >
-          Отмена
+          {isUserCreating
+            ? `${editUser ? "Cохранение" : "Добавление"}`
+            : `${editUser ? "Сохранить" : "Добавить"}`}
         </button>
-      )}
+
+        {editUser && (
+          <button
+            onClick={onClick}
+            disabled={isUserCreating}
+            className="btn btn-danger"
+          >
+            Отмена
+          </button>
+        )}
+      </Column>
     </Container>
   );
 };

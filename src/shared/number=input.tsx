@@ -24,7 +24,8 @@ export const NumberInput = ({ field, placeholder, isDisabled, width, onChange }:
   onChange(Number(numberOnly));
 }
   return (
-    <div style={{width: width ?? INPUT_WIDTH}}>
+    <div className="d-flex flex-column gap-1 allign-items-start"
+    style={{width: width ?? INPUT_WIDTH}}>
       <input
         value={field.number?? ""}
         onChange={(e) => handleSanytizeText(e.target.value)}
@@ -33,9 +34,15 @@ export const NumberInput = ({ field, placeholder, isDisabled, width, onChange }:
         placeholder={placeholder}
         disabled={isDisabled}
       />
-      {field.errorText && (
-        <span className="text-danger">{field.errorText}</span>
-      )}
+      <div className="d-flex flex-column">
+        {field.errors &&
+          field.errors.length > 0 &&
+          field.errors.map((e, i) => (
+            <span className="text-danger" key={i}>
+              {e}
+            </span>
+          ))}
+      </div>
     </div>
   );
 };
